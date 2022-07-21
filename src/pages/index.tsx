@@ -3,11 +3,14 @@ import type {GetStaticProps, NextPage} from 'next';
 
 const Home: NextPage = ({rooms}: any) => {
   return (
-    <Viewer>
-      {rooms.map((room: any) => (
-        <Viewer.Room {...room} key={room.id} />
-      ))}
-    </Viewer>
+    <div className="panoramas">
+      <Viewer>
+        {rooms.map((room: any) => (
+          <Viewer.Room {...room} key={room.id} />
+        ))}
+      </Viewer>
+      <Viewer.Compass />
+    </div>
   );
 };
 
@@ -18,8 +21,12 @@ export const getStaticProps: GetStaticProps = () => {
       type: 'image',
       name: 'Room 1',
       pitch: 0,
-      yaw: 112,
-      hfov: 120,
+      minPitch: 0,
+      maxPitch: 0,
+      yaw: 67,
+      minYaw: -67,
+      maxYaw: 120,
+      hfov: 90,
       panoramaImage:
         'https://res.cloudinary.com/lavana/image/upload/v1658403646/panoramas/25_6_2022_fpoly_1_-_Panorama_4_-_Panorama_jtzttr_psixha.jpg',
       compass: true,
@@ -37,12 +44,12 @@ export const getStaticProps: GetStaticProps = () => {
           transform3d: false,
           rotateX: 0,
           rotateZ: 0,
-          scale: true,
-          sizeScale: 1,
+          scale: false,
+          sizeScale: 1.5,
           object: 'marker',
           idRoomTarget: 'scene2',
           nameRoomTarget: 'Room 2',
-          transitionZoom: 20,
+          transitionZoom: 0,
           timeAnimated: 500,
           lookAt: true,
         },
@@ -52,9 +59,13 @@ export const getStaticProps: GetStaticProps = () => {
       id: 'scene2',
       type: 'image',
       name: 'Room 2',
-      pitch: 2,
-      yaw: -7.6,
-      hfov: 120,
+      pitch: 0,
+      minPitch: 0,
+      maxPitch: 0,
+      yaw: -4,
+      minYaw: -120,
+      maxYaw: 120,
+      hfov: 90,
       compass: true,
       panoramaImage:
         'https://res.cloudinary.com/lavana/image/upload/v1658403596/panoramas/25_6_2022_fpoly_1_-_Panorama_5_-_Panorama_bp9w3r_ntfuvj.jpg',
@@ -72,7 +83,7 @@ export const getStaticProps: GetStaticProps = () => {
           rotateZ: 0,
           idRoom: 'scene2',
           animation: 'pulse-a',
-          scale: true,
+          scale: false,
           sizeScale: 1.5,
           object: 'marker',
           idRoomTarget: 'scene3',
@@ -88,8 +99,12 @@ export const getStaticProps: GetStaticProps = () => {
       type: 'image',
       name: 'Room 3',
       pitch: 0,
-      yaw: 112,
-      hfov: 120,
+      minPitch: 0,
+      maxPitch: 0,
+      yaw: 67,
+      minYaw: -67,
+      maxYaw: 120,
+      hfov: 90,
       panoramaImage:
         'https://res.cloudinary.com/lavana/image/upload/v1658403646/panoramas/25_6_2022_fpoly_1_-_Panorama_4_-_Panorama_jtzttr_psixha.jpg',
       compass: true,
@@ -107,12 +122,12 @@ export const getStaticProps: GetStaticProps = () => {
           transform3d: false,
           rotateX: 0,
           rotateZ: 0,
-          scale: true,
-          sizeScale: 1,
+          scale: false,
+          sizeScale: 1.5,
           object: 'marker',
           idRoomTarget: 'scene4',
           nameRoomTarget: 'Room 4',
-          transitionZoom: 20,
+          transitionZoom: 0,
           timeAnimated: 500,
           lookAt: true,
         },
@@ -122,9 +137,13 @@ export const getStaticProps: GetStaticProps = () => {
       id: 'scene4',
       type: 'image',
       name: 'Room 4',
-      pitch: 2,
-      yaw: -7.6,
-      hfov: 120,
+      pitch: 0,
+      minPitch: 0,
+      maxPitch: 0,
+      yaw: -4,
+      minYaw: -120,
+      maxYaw: 120,
+      hfov: 90,
       compass: true,
       panoramaImage:
         'https://res.cloudinary.com/lavana/image/upload/v1658403596/panoramas/25_6_2022_fpoly_1_-_Panorama_5_-_Panorama_bp9w3r_ntfuvj.jpg',
@@ -142,7 +161,7 @@ export const getStaticProps: GetStaticProps = () => {
           rotateZ: 0,
           idRoom: 'scene4',
           animation: 'pulse-a',
-          scale: true,
+          scale: false,
           sizeScale: 1.5,
           object: 'marker',
           idRoomTarget: 'scene1',

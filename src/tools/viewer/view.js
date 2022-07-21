@@ -27,7 +27,7 @@ class Viewer extends Handler {
 
   render() {
     return (
-      <div className="panoramas">
+      <div className="panorama_wrapper">
         <div id="panorama_view"></div>
         <Loading />
         <img id="panorama_background" />
@@ -83,5 +83,14 @@ const Loading = () => {
 };
 
 Viewer.Room = () => {};
+Viewer.Compass = function compass() {
+  return (
+    <div
+      id="compass_icon"
+      className="small-element controls_btn compass_control">
+      <i className="icon-compass"></i>
+    </div>
+  );
+};
 
 export default Viewer;

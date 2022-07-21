@@ -92,6 +92,10 @@ class Handler extends PureComponent {
         this.loading(false);
       }, 50);
     });
+    this.panoViewer.on('mousedown', (e) => {
+      console.log(this.panoViewer.getPitch());
+      console.log(this.panoViewer.getYaw());
+    });
   }
 
   loading(status) {
@@ -138,6 +142,11 @@ class Handler extends PureComponent {
       }
     });
     hotSpotDiv.addEventListener('mouseleave', function (e) {
+      if (!utils.isMobileOrIOS) {
+        document.getElementById('tooltip_marker_' + args.id).style.opacity = 0;
+      }
+    });
+    hotSpotDiv.addEventListener('mouseup', function (e) {
       if (!utils.isMobileOrIOS) {
         document.getElementById('tooltip_marker_' + args.id).style.opacity = 0;
       }

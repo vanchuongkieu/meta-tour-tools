@@ -1835,29 +1835,6 @@ export default (function (window, document, undefined) {
             compass_icon.style.webkitTransform =
               'rotate(' + (-config.yaw - config.northOffset) + 'deg)';
           } catch (e) {}
-          try {
-            var view = document.getElementsByClassName(
-              'pointer_' + config.idRoom
-            );
-            var scale = view[0].getAttribute('data-scale');
-            var degree = config.northOffset + config.map_north - 90;
-            Array.prototype.forEach.call(view, function (el) {
-              el.style.transform =
-                'rotate(' + (config.yaw + degree) + 'deg) scale(' + scale + ')';
-              el.style.webkitTransform =
-                'rotate(' + (config.yaw + degree) + 'deg) scale(' + scale + ')';
-            });
-          } catch (e) {}
-          try {
-            var view_m = document.getElementById(
-              'map_tour_arrow_' + config.idRoom
-            );
-            var degree_m = config.northOffset - 135;
-            view_m.style.transform =
-              'rotate(' + (config.yaw + degree_m) + 'deg)';
-            view_m.style.webkitTransform =
-              'rotate(' + (config.yaw + degree_m) + 'deg)';
-          } catch (e) {}
         }
       }
     }
@@ -2543,7 +2520,6 @@ export default (function (window, document, undefined) {
                   20 * hs.sizeScale +
                   (hs.rotateX / 70) * 20) +
                 'px) translateZ(9999px)';
-                console.log(transform_tooltip);
               tooltip.style.webkitTransform = transform_tooltip;
               tooltip.style.MozTransform = transform_tooltip;
               tooltip.style.transform = transform_tooltip;

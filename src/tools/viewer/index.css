@@ -3,6 +3,13 @@
 .panoramas {
   width: 100%;
   height: 100vh;
+  position: relative;
+}
+
+.panorama_wrapper {
+  width: 100%;
+  height: 100%;
+  position: absolute;
 }
 
 #panorama_background {
@@ -65,4 +72,54 @@
   -ms-transition: opacity 0.3s ease-in-out;
   -o-transition: opacity 0.3s ease-in-out;
   transition: opacity 0.3s ease-in-out;
+}
+
+#compass_icon {
+  position: absolute;
+  background-color: rgba(0, 0, 0, 0.6);
+  color: rgb(255, 255, 255);
+  font-size: 16px;
+  z-index: 42;
+  cursor: pointer;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  font-size: 12px;
+  line-height: 30px;
+  text-align: center;
+}
+
+.pnlm-compass {
+  display: none !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+@font-face {
+  font-family: 'compass';
+  src: url('../libraries/webfonts/compass.eot');
+  src: url('../libraries/webfonts/compass.eot') format('embedded-opentype'),
+    url('../libraries/webfonts/compass.ttf') format('truetype'),
+    url('../libraries/webfonts/compass.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+}
+
+[class^='icon-compass'],
+[class*=' icon-compass'] {
+  font-family: 'compass' !important;
+  speak: never;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-compass:before {
+  content: '\e902';
+  transform: rotate(40deg);
 }

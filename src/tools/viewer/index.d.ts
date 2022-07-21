@@ -69,6 +69,7 @@ function Viewer(props: ViewerPropsType): JSX.Element;
 
 namespace Viewer {
   export function Room(props: RoomPropsType): JSX.Element;
+  export function Compass(): JSX.Element;
 }
 
 export default Viewer;
