@@ -160,7 +160,7 @@ export default (function (window, document, undefined) {
     infoDisplay.author = document.createElement('div');
     infoDisplay.author.className = 'pnlm-author-box';
     infoDisplay.container.appendChild(infoDisplay.author);
-    uiContainer.appendChild(infoDisplay.container);
+    // uiContainer.appendChild(infoDisplay.container);
 
     // Load box
     infoDisplay.load = {};
@@ -186,7 +186,7 @@ export default (function (window, document, undefined) {
     // Error message
     infoDisplay.errorMsg = document.createElement('div');
     infoDisplay.errorMsg.className = 'pnlm-error-msg pnlm-info-box';
-    uiContainer.appendChild(infoDisplay.errorMsg);
+    // uiContainer.appendChild(infoDisplay.errorMsg);
 
     // Create controls
     var controls = {};
@@ -1837,7 +1837,7 @@ export default (function (window, document, undefined) {
           } catch (e) {}
           try {
             var view = document.getElementsByClassName(
-              'pointer_' + config.id_room
+              'pointer_' + config.idRoom
             );
             var scale = view[0].getAttribute('data-scale');
             var degree = config.northOffset + config.map_north - 90;
@@ -1850,7 +1850,7 @@ export default (function (window, document, undefined) {
           } catch (e) {}
           try {
             var view_m = document.getElementById(
-              'map_tour_arrow_' + config.id_room
+              'map_tour_arrow_' + config.idRoom
             );
             var degree_m = config.northOffset - 135;
             view_m.style.transform =
