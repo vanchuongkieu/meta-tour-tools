@@ -1,11 +1,15 @@
+import utils from '@/utils';
 import PropTypes from 'prop-types';
 import Handler from './handler';
 
+let $this;
+let panoViewer;
 class Viewer extends Handler {
   constructor(props) {
     super(props);
+    $this = this;
     this.state = {
-      panoramaBob: [],
+      isLoading: true,
       panoramas: this.panoramas(props),
     };
   }
@@ -15,30 +19,136 @@ class Viewer extends Handler {
       PropTypes.arrayOf(PropTypes.node),
       PropTypes.node,
     ]).isRequired,
+    draggable: PropTypes.bool,
+    onMouseWheel: PropTypes.func,
+    onMouseMove: PropTypes.func,
+    onError: PropTypes.func,
+  };
+
+  static defaultProps = {
+    draggable: false,
   };
 
   componentDidMount() {
-    this.initializeRoom();
+    panoViewer = this.initializeRoom();
+    panoViewer.on('error', (message) => this.onError(message));
+    panoViewer.on('mousewheel', (hfov) => this.onMouseWheel(hfov));
+    panoViewer.on('mousemove', (coords) => this.onMouseMove(coords));
+    panoViewer.on('loadroom', (idRoom) => this.onLoadRoom(idRoom));
   }
 
-  componentDidUpdate() {
-    console.log('updating');
+  onMouseWheel(hfov) {
+    if (!this.props.onMouseWheel) return;
+    this.props.onMouseWheel(hfov);
+  }
+
+  onMouseMove(coords) {
+    if (!this.props.onMouseMove) return;
+    this.props.onMouseMove(coords);
+  }
+
+  onLoadRoom(idRoom) {
+    this.setState({isLoading: false});
+    if (!this.props.onLoadRoom) return;
+    this.props.onLoadRoom(idRoom);
+  }
+
+  onError(message) {
+    if (!this.props.onError) return;
+    this.props.onError(message);
+  }
+
+  componentDidUpdate() {}
+
+  componentWillUnmount() {
+    panoViewer.off('load');
+    panoViewer.off('error');
+    panoViewer.off('loadroom');
+    panoViewer.off('mousemove');
+    panoViewer.off('mousewheel');
+  }
+
+  static loadRoom(idRoom, targetPitch, targetYaw, targetHfov) {
+    $this.setState({isLoading: true});
+    const pitch = panoViewer.getPitch();
+    const hfov = panoViewer.getHfov();
+    const yaw = panoViewer.getYaw();
+    panoViewer.lookAt(pitch, yaw, hfov - 0.5, 500, () => {
+      panoViewer.loadScene(idRoom, targetPitch, targetYaw, targetHfov);
+    });
+  }
+
+  static setPitch(pitch) {
+    panoViewer.setPitch(pitch);
+  }
+
+  static setPitchBounds(bounds) {
+    panoViewer.setPitchBounds(bounds);
+  }
+
+  static setYaw(yaw) {
+    panoViewer.setYaw(yaw);
+  }
+
+  static setYawBounds(bounds) {
+    panoViewer.setYawBounds(bounds);
+  }
+
+  static startOrientation() {
+    if (!utils.isMobileOrIOS) startOrientation();
+  }
+
+  static stopOrientation() {
+    stopOrientation();
+  }
+
+  static gotoNextroom() {
+    const current = panoViewer.getScene();
+    const allScene = panoViewer.getScenes();
+    const objectKeys = Object.keys(allScene);
+    objectKeys.forEach((scene, index) => {
+      if (current === scene) {
+        if (index + 1 < objectKeys.length) {
+          Viewer.loadRoom(objectKeys[index + 1]);
+        } else {
+          Viewer.loadRoom(objectKeys[0]);
+        }
+      }
+    });
+  }
+
+  static gotoPrevroom() {
+    const current = panoViewer.getScene();
+    const allScene = panoViewer.getScenes();
+    const objectKeys = Object.keys(allScene);
+    objectKeys.forEach((scene, index) => {
+      if (current === scene) {
+        if (index - 1 >= 0) {
+          Viewer.loadRoom(objectKeys[index - 1]);
+        } else {
+          Viewer.loadRoom(objectKeys[objectKeys.length - 1]);
+        }
+      }
+    });
   }
 
   render() {
+    const {isLoading} = this.state;
     return (
       <div className="panorama_wrapper">
         <div id="panorama_view"></div>
-        <Loading />
+        <Loading loading={isLoading} />
         <img id="panorama_background" />
       </div>
     );
   }
 }
 
-const Loading = () => {
+const Loading = ({loading}) => {
   return (
-    <i id="loading_pano" style={{opacity: 0, display: 'none'}}>
+    <i
+      id="loading_pano"
+      style={{opacity: Number(loading), display: loading ? 'block' : 'none'}}>
       <svg
         width="38"
         height="38"
@@ -80,6 +190,14 @@ const Loading = () => {
       </svg>
     </i>
   );
+};
+
+Loading.propTypes = {
+  loading: PropTypes.bool,
+};
+
+Loading.defaultProps = {
+  loading: true,
 };
 
 Viewer.Room = () => {};

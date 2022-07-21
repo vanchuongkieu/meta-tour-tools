@@ -1,4 +1,6 @@
 /* eslint-disable */
+import utils from '@/utils';
+import viewer from '../viewer';
 import libpannellum from './libpannellum';
 export default (function (window, document, undefined) {
   function Viewer(container, initialConfig) {
@@ -247,16 +249,8 @@ export default (function (window, document, undefined) {
     controls.orientation.className =
       'pnlm-orientation-button pnlm-orientation-button-inactive pnlm-sprite pnlm-controls pnlm-control';
     var orientationSupport = false;
-    if (
-      window.DeviceOrientationEvent &&
-      location.protocol == 'https:' &&
-      navigator.userAgent.toLowerCase().indexOf('mobi') >= 0
-    ) {
-      // This user agent check is here because there's no way to check if a
-      // device has an inertia measurement unit. We used to be able to check if a
-      // DeviceOrientationEvent had non-null values, but with iOS 13 requiring a
-      // permission prompt to access such events, this is no longer possible.
-      controls.container.appendChild(controls.orientation);
+    if (utils.isMobileOrIOS) {
+      // controls.container.appendChild(controls.orientation);
       orientationSupport = true;
     }
 
@@ -931,6 +925,15 @@ export default (function (window, document, undefined) {
           onPointerDownPitch;
         speed.pitch = (pitch - config.pitch) * 0.2;
         config.pitch = pitch;
+
+        fireEvent('mousemove', {
+          pitch: config.pitch, 
+          yaw:config.yaw, 
+          maxPitch: config.maxPitch,
+          maxYaw: config.maxYaw,
+          minPitch: config.minPitch,
+          minYaw: config.minYaw,
+        });
       }
     }
 
@@ -1059,6 +1062,15 @@ export default (function (window, document, undefined) {
           onPointerDownPitch;
         speed.pitch = (pitch - config.pitch) * 0.2;
         config.pitch = pitch;
+        
+        fireEvent('mousemove', {
+          pitch: config.pitch, 
+          yaw:config.yaw, 
+          maxPitch: config.maxPitch,
+          maxYaw: config.maxYaw,
+          minPitch: config.minPitch,
+          minYaw: config.minYaw,
+        });
       }
     }
 
@@ -1124,6 +1136,15 @@ export default (function (window, document, undefined) {
             return;
           }
         }
+
+        fireEvent('mousemove', {
+          pitch: config.pitch, 
+          yaw:config.yaw, 
+          maxPitch: config.maxPitch,
+          maxYaw: config.maxYaw,
+          minPitch: config.minPitch,
+          minYaw: config.minYaw,
+        });
       }
     }
 
@@ -1185,7 +1206,9 @@ export default (function (window, document, undefined) {
         setHfov(config.hfov + event.detail * 0.75);
         speed.hfov = event.detail > 0 ? 0.15 : -0.15;
       }
+
       animateInit();
+      fireEvent("mousewheel", config.hfov);
     }
 
     /**
@@ -1220,10 +1243,10 @@ export default (function (window, document, undefined) {
             }
           } else if (keynumber == 90) {
             // If "z" is pressed
-            goto_prev_room();
+            viewer.gotoPrevroom();
           } else if (keynumber == 88) {
             // If "x" is pressed
-            goto_next_room();
+            viewer.gotoNextroom();
           } else {
             // Change key
             changeKey(keynumber, true);
@@ -2047,7 +2070,6 @@ export default (function (window, document, undefined) {
       loaded = true;
 
       animateInit();
-
       fireEvent('load');
     }
 
@@ -3650,7 +3672,10 @@ export default (function (window, document, undefined) {
      * @returns {Viewer} `this`
      */
     this.loadScene = function (sceneId, pitch, yaw, hfov) {
-      if (loaded !== false) loadScene(sceneId, pitch, yaw, hfov);
+      if (loaded !== false) {
+        loadScene(sceneId, pitch, yaw, hfov);
+        fireEvent("loadroom", sceneId);
+      }
       return this;
     };
 
@@ -3663,6 +3688,10 @@ export default (function (window, document, undefined) {
     this.getScene = function () {
       return config.scene;
     };
+
+    this.getScenes = function () {
+      return config.scenes;
+    }
 
     /**
      * Add a new scene.

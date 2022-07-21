@@ -89,26 +89,16 @@ class Handler extends PureComponent {
     });
     this.panoViewer.on('load', () => {
       setTimeout(() => {
-        this.loading(false);
+        this.setState({isLoading: false});
       }, 50);
     });
-    this.panoViewer.on('mousedown', (e) => {
-      console.log(this.panoViewer.getPitch());
-      console.log(this.panoViewer.getYaw());
-    });
-  }
-
-  loading(status) {
-    document.getElementById('loading_pano').style.opacity = Number(status);
-    document.getElementById('loading_pano').style.display = status
-      ? 'block'
-      : 'none';
+    return this.panoViewer;
   }
 
   goto(_, [_this, idRoom, pitch, yaw, zoom, animated, lookAt]) {
     let yawM = yaw;
     let pitchM = pitch;
-    _this.loading(true);
+    _this.setState({isLoading: true});
     lookAt = lookAt === undefined ? 0 : Number(lookAt);
     if (lookAt == 0) {
       pitchM = parseFloat(_this.panoViewer.getPitch());
@@ -178,10 +168,6 @@ class Handler extends PureComponent {
     divWrapper.style.background = args.background;
     divWrapper.style.color = args.color;
     hotSpotDiv.appendChild(divWrapper);
-  }
-
-  componentWillUnmount() {
-    this.panoViewer.off('load');
   }
 }
 

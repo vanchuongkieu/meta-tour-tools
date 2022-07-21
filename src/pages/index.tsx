@@ -4,7 +4,7 @@ import type {GetStaticProps, NextPage} from 'next';
 const Home: NextPage = ({rooms}: any) => {
   return (
     <div className="panoramas">
-      <Viewer>
+      <Viewer onLoadRoom={console.log}>
         {rooms.map((room: any) => (
           <Viewer.Room {...room} key={room.id} />
         ))}
