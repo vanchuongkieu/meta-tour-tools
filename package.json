@@ -1,0 +1,36 @@
+{
+  "name": "meta-tour-viewer",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "format": "prettier --write .",
+    "check:format": "prettier --check .",
+    "check:types": "tsc --pretty --noEmit",
+    "check:lint": "eslint . --ext ts --ext tsx --ext js",
+    "check": "npm run check:format && npm run check:lint && npm run check:types && npm run build"
+  },
+  "dependencies": {
+    "next": "12.2.2",
+    "prop-types": "^15.8.1",
+    "react": "18.2.0",
+    "react-dom": "18.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "18.0.3",
+    "@types/react": "18.0.15",
+    "@types/react-dom": "18.0.6",
+    "@typescript-eslint/eslint-plugin": "^5.30.6",
+    "@typescript-eslint/parser": "^5.30.6",
+    "eslint": ">=5.16.0",
+    "eslint-config-google": "^0.14.0",
+    "eslint-config-next": "12.2.2",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-react": "^7.30.1",
+    "prettier": "^2.7.1",
+    "typescript": "4.7.4"
+  }
+}
