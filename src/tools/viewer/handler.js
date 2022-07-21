@@ -1,4 +1,3 @@
-import utils from '@/utils';
 import {PureComponent} from 'react';
 import pannellum from '../libraries/pannellum';
 
@@ -10,7 +9,6 @@ class Handler extends PureComponent {
       room.panorama = room.panoramaImage;
       if (room.panoramaBlob) {
         room.panorama = room.panoramaBlob;
-        delete room.panoramaBlob;
       }
       room.hotSpots = room.markers.map((marker) => {
         switch (marker.object) {
@@ -41,6 +39,7 @@ class Handler extends PureComponent {
                 marker.idRoomTarget,
                 parseInt(marker.pitch),
                 parseInt(marker.yaw),
+                marker.transitionZoom,
                 marker.lookAt,
               ],
             };
@@ -69,26 +68,13 @@ class Handler extends PureComponent {
       autoLoad: true,
       showZoomCtrl: false,
       showFullscreenCtrl: false,
-      orientationOnByDefault: utils.isMobileOrIOS,
     });
     this.panoViewer.on('load', () => {
-      this.preloadNextImage();
+      setTimeout(() => {
+        document.getElementById('loading_pano').style.opacity = 0;
+        document.getElementById('loading_pano').style.display = 'none';
+      }, 100);
     });
-  }
-
-  async preloadNextImage() {
-    const {panoramas} = this.state;
-    const mapBlob = [];
-    for (let i = 0; i < panoramas.length; i++) {
-      const img = panoramas[i].panorama;
-      const id = panoramas[i].id;
-      const mapping = await this.loadImage(img, id, i).then((response) => {
-        const imageBlob = window.URL.createObjectURL(response);
-        return {...panoramas[i], panoramaBlob: imageBlob};
-      });
-      mapBlob.push(mapping);
-    }
-    this.setState({panoramas: mapBlob});
   }
 
   loadImage(url, id, index) {
@@ -107,19 +93,37 @@ class Handler extends PureComponent {
     return this.state.panoramas.find((panorama) => panorama.id === idRoom);
   }
 
-  goto(_, [_this, idRoom, pitch, yaw, lookAt]) {
+  fadeBackground(room) {
+    const dataURL = this.panoViewer
+      .getRenderer()
+      .render(
+        (this.panoViewer.getPitch() / 180) * Math.PI,
+        (this.panoViewer.getYaw() / 180) * Math.PI,
+        (this.panoViewer.getHfov() / 180) * Math.PI,
+        {returnImage: 'blob'}
+      );
+    room.preview = dataURL;
+    document.getElementById('loading_pano').style =
+      'opacity: 1; display: block';
+    setTimeout(() => {
+      this.initializeRoom(room);
+    }, 50);
+  }
+
+  goto(_, [_this, idRoom, pitch, yaw, zoom, lookAt]) {
     lookAt = lookAt === undefined ? 0 : Number(lookAt);
     const room = _this.findRoom(idRoom);
-    switch (lookAt) {
-      case 0:
-        _this.initializeRoom(room);
-        break;
-      case 1:
-        _this.lookAt(pitch, yaw, 120, 400, () => {
-          _this.initializeRoom(room);
-        });
-        break;
+    let pitchM = pitch;
+    let yawM = yaw;
+    if (lookAt == 0) {
+      pitchM = parseFloat(_this.panoViewer.getPitch());
+      yawM = parseFloat(_this.panoViewer.getYaw());
     }
+    const hfovM = parseInt(_this.panoViewer.getHfov());
+    const transitionZoom = hfovM - zoom;
+    _this.lookAt(pitchM, yawM, transitionZoom, 300, () => {
+      _this.fadeBackground(room);
+    });
   }
 
   lookAt(...args) {

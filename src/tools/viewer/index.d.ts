@@ -26,6 +26,7 @@ export interface RoomPropsType {
   annotationDescription?: string;
   markers?: MarkerPropsType[];
   backgroundColor?: number[];
+  transitionZoom?: number;
 }
 
 export interface MarkerPropsType {

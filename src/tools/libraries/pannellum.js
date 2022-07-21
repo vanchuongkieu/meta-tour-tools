@@ -181,7 +181,7 @@ export default (function (window, document, undefined) {
     infoDisplay.load.msg = document.createElement('p');
     infoDisplay.load.msg.className = 'pnlm-lmsg';
     infoDisplay.load.box.appendChild(infoDisplay.load.msg);
-    uiContainer.appendChild(infoDisplay.load.box);
+    // uiContainer.appendChild(infoDisplay.load.box);
 
     // Error message
     infoDisplay.errorMsg = document.createElement('div');

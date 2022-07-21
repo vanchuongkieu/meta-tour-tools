@@ -41,6 +41,7 @@ export const getStaticProps: GetStaticProps = () => {
           object: 'marker',
           idRoomTarget: 'scene2',
           nameRoomTarget: 'Room 2',
+          transitionZoom: 20,
           lookAt: true,
         },
       ],
