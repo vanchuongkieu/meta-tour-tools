@@ -5,7 +5,6 @@ export interface RoomPropsType {
   song?: string;
   idMap?: string;
   panoramaImage?: string;
-  panoramaBlob?: string;
   songVolume?: number;
   pitch?: number;
   maxPitch?: number;
@@ -26,7 +25,6 @@ export interface RoomPropsType {
   annotationDescription?: string;
   markers?: MarkerPropsType[];
   backgroundColor?: number[];
-  transitionZoom?: number;
 }
 
 export interface MarkerPropsType {
@@ -34,8 +32,8 @@ export interface MarkerPropsType {
   yaw?: number;
   icon?: string;
   pitch?: number;
-  tooltip_text?: string;
-  tooltip_type: 'room_name' | 'text';
+  tooltipText?: string;
+  tooltipType: 'room_name' | 'text';
   content?: string; // JSON stringify
   idRoomTarget?: string;
   nameRoomTarget?: string;
@@ -54,10 +52,13 @@ export interface MarkerPropsType {
   rotateZ?: number;
   transform3d?: boolean;
   sizeScale?: number;
-  background?: string;
-  color?: string;
+  background?: string | number[];
+  color?: string | number[];
   cssClass?: string;
   lookAt?: boolean;
+  transitionZoom?: number;
+  timeAnimated?: number;
+  draggable?: boolean;
 }
 
 interface ViewerPropsType {

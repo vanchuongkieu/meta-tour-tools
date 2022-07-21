@@ -1,29 +1,51 @@
+import utils from '@/utils';
 import {PureComponent} from 'react';
 import pannellum from '../libraries/pannellum';
 
 class Handler extends PureComponent {
   panoramas({children}) {
     const rooms = Array.isArray(children) ? [...children] : [children];
-    return rooms.map((c) => {
+    const mappingRoom = rooms.map((c) => {
       const room = {...c.props};
       room.panorama = room.panoramaImage;
-      if (room.panoramaBlob) {
-        room.panorama = room.panoramaBlob;
-      }
       room.hotSpots = room.markers.map((marker) => {
         switch (marker.object) {
           case 'marker':
-            let tooltip = marker.tooltip_text;
+            let eventHandling = {};
+            let tooltip = marker.tooltipText;
             if (marker.tooltip_type == 'room_name') {
               tooltip = marker.nameRoomTarget;
+            }
+            if (marker.draggable) {
+              eventHandling = {
+                dragHandlerFunc: this.draggable,
+                dragHandlerArgs: this,
+              };
+            } else {
+              eventHandling = {
+                clickHandlerFunc: this.goto,
+                clickHandlerArgs: [
+                  this,
+                  marker.idRoomTarget,
+                  parseInt(marker.pitch),
+                  parseInt(marker.yaw),
+                  marker.transitionZoom,
+                  marker.timeAnimated,
+                  marker.lookAt,
+                ],
+              };
             }
             return {
               id: marker.id,
               text: tooltip,
+              cssClass: 'custom-hotspot',
+              createTooltipFunc: this.hotspot,
+              createTooltipArgs: marker,
               pitch: marker.pitch,
               yaw: marker.yaw,
               icon: marker.icon,
               type: marker.type,
+              draggable: marker.draggable,
               animation: marker.animation,
               transform3d: marker.transform3d,
               rotateX: marker.rotateX,
@@ -33,15 +55,7 @@ class Handler extends PureComponent {
               object: marker.object,
               idRoomTarget: marker.idRoomTarget,
               nameRoomTarget: marker.nameRoomTarget,
-              clickHandlerFunc: this.goto,
-              clickHandlerArgs: [
-                this,
-                marker.idRoomTarget,
-                parseInt(marker.pitch),
-                parseInt(marker.yaw),
-                marker.transitionZoom,
-                marker.lookAt,
-              ],
+              ...eventHandling,
             };
         }
       });
@@ -52,82 +66,113 @@ class Handler extends PureComponent {
       }
       return room;
     });
+
+    return mappingRoom.reduce((accumulated, current) => {
+      return {
+        ...accumulated,
+        [current.id]: current,
+      };
+    }, {});
   }
 
-  startWithFirstRoom() {
-    return this.initializeRoom(this.state.panoramas[0]);
-  }
-
-  initializeRoom(room) {
+  initializeRoom() {
     try {
       this.panoViewer.destroy();
+      this.panoViewer = null;
     } catch (error) {}
-    this.panoViewer = null;
     this.panoViewer = pannellum.viewer('panorama_view', {
-      ...room,
       autoLoad: true,
+      firstScene: 'scene1',
       showZoomCtrl: false,
       showFullscreenCtrl: false,
+      scenes: this.state.panoramas,
     });
     this.panoViewer.on('load', () => {
       setTimeout(() => {
-        document.getElementById('loading_pano').style.opacity = 0;
-        document.getElementById('loading_pano').style.display = 'none';
-      }, 100);
+        this.loading(false);
+      }, 50);
     });
   }
 
-  loadImage(url, id, index) {
-    return new Promise(function (resolve) {
-      try {
-        fetch(url)
-          .then((res) => res.blob())
-          .then((res) => resolve(res, id, index));
-      } catch (err) {
-        resolve('', id, index);
-      }
-    });
+  loading(status) {
+    document.getElementById('loading_pano').style.opacity = Number(status);
+    document.getElementById('loading_pano').style.display = status
+      ? 'block'
+      : 'none';
   }
 
-  findRoom(idRoom) {
-    return this.state.panoramas.find((panorama) => panorama.id === idRoom);
-  }
-
-  fadeBackground(room) {
-    const dataURL = this.panoViewer
-      .getRenderer()
-      .render(
-        (this.panoViewer.getPitch() / 180) * Math.PI,
-        (this.panoViewer.getYaw() / 180) * Math.PI,
-        (this.panoViewer.getHfov() / 180) * Math.PI,
-        {returnImage: 'blob'}
-      );
-    room.preview = dataURL;
-    document.getElementById('loading_pano').style =
-      'opacity: 1; display: block';
-    setTimeout(() => {
-      this.initializeRoom(room);
-    }, 50);
-  }
-
-  goto(_, [_this, idRoom, pitch, yaw, zoom, lookAt]) {
-    lookAt = lookAt === undefined ? 0 : Number(lookAt);
-    const room = _this.findRoom(idRoom);
-    let pitchM = pitch;
+  goto(_, [_this, idRoom, pitch, yaw, zoom, animated, lookAt]) {
     let yawM = yaw;
+    let pitchM = pitch;
+    _this.loading(true);
+    lookAt = lookAt === undefined ? 0 : Number(lookAt);
     if (lookAt == 0) {
       pitchM = parseFloat(_this.panoViewer.getPitch());
       yawM = parseFloat(_this.panoViewer.getYaw());
     }
+    const room = _this.state.panoramas[idRoom];
     const hfovM = parseInt(_this.panoViewer.getHfov());
     const transitionZoom = hfovM - zoom;
-    _this.lookAt(pitchM, yawM, transitionZoom, 300, () => {
-      _this.fadeBackground(room);
+    _this.panoViewer.lookAt(pitchM, yawM, transitionZoom, animated, () => {
+      _this.panoViewer.loadScene(idRoom, room.pitch, room.yaw, room.hfov);
     });
   }
 
-  lookAt(...args) {
-    this.panoViewer.lookAt(...args);
+  draggable(_, _this) {
+    _this.panoViewer.setPitch(this.pitch);
+    _this.panoViewer.setYaw(this.yaw);
+  }
+
+  hotspot(hotSpotDiv, args) {
+    hotSpotDiv.classList.add('custom-tooltip');
+    hotSpotDiv.classList.add('noselect');
+    hotSpotDiv.classList.add('marker_' + args.id);
+    hotSpotDiv.addEventListener('mouseover', function (e) {
+      if (!utils.isMobileOrIOS) {
+        document.getElementById('tooltip_marker_' + args.id).style.opacity = 1;
+      }
+    });
+    hotSpotDiv.addEventListener('mouseenter', function (e) {
+      if (!utils.isMobileOrIOS) {
+        document.getElementById('tooltip_marker_' + args.id).style.opacity = 1;
+      }
+    });
+    hotSpotDiv.addEventListener('mouseleave', function (e) {
+      if (!utils.isMobileOrIOS) {
+        document.getElementById('tooltip_marker_' + args.id).style.opacity = 0;
+      }
+    });
+
+    switch (args.tooltipType) {
+      case 'text':
+        if (args.tooltipText && args.tooltipText !== '') {
+          const tooltip = document.createElement('div');
+          tooltip.setAttribute('id', 'tooltip_marker_' + args.id);
+          tooltip.classList.add('tooltip_marker_' + args.id);
+          tooltip.classList.add('tooltip_text');
+          tooltip.innerHTML = args.tooltipText.toUpperCase();
+          hotSpotDiv.parentNode.appendChild(tooltip);
+        }
+        break;
+      case 'room_name':
+        const tooltip = document.createElement('div');
+        tooltip.setAttribute('id', 'tooltip_marker_' + args.id);
+        tooltip.classList.add('tooltip_marker_' + args.id);
+        tooltip.classList.add('tooltip_text');
+        tooltip.innerHTML = args.nameRoomTarget.toUpperCase();
+        hotSpotDiv.parentNode.appendChild(tooltip);
+        break;
+    }
+
+    const divWrapper = document.createElement('div');
+    divWrapper.classList.add('div_marker_wrapper');
+    divWrapper.style.background = args.background;
+    divWrapper.style.color = args.color;
+    hotSpotDiv.appendChild(divWrapper);
+  }
+
+  componentWillUnmount() {
+    this.panoViewer.off('load');
   }
 }
 

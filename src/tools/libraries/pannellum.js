@@ -2303,6 +2303,7 @@ export default (function (window, document, undefined) {
         span.className += ' pnlm-pointer';
       }
       if (hs.draggable) {
+        div.className += ' pnlm-pointer';
         // Handle mouse by container event listeners
         div.addEventListener('mousedown', function (e) {
           if (hs.dragHandlerFunc) hs.dragHandlerFunc(e, hs.dragHandlerArgs);
@@ -2506,7 +2507,7 @@ export default (function (window, document, undefined) {
                 'px, ' +
                 (coord[1] -
                   box_height -
-                  10 * hs.size_scale +
+                  10 * hs.sizeScale +
                   (hs.rotateX / 70) * 20) +
                 'px) translateZ(9999px)';
               box.style.webkitTransform = transform_box;
@@ -2539,9 +2540,10 @@ export default (function (window, document, undefined) {
                 'px, ' +
                 (coord[1] -
                   tooltip_height -
-                  20 * hs.size_scale +
+                  20 * hs.sizeScale +
                   (hs.rotateX / 70) * 20) +
                 'px) translateZ(9999px)';
+                console.log(transform_tooltip);
               tooltip.style.webkitTransform = transform_tooltip;
               tooltip.style.MozTransform = transform_tooltip;
               tooltip.style.transform = transform_tooltip;
@@ -2565,7 +2567,7 @@ export default (function (window, document, undefined) {
                   'px, ' +
                   (coord[1] -
                     tooltip_height -
-                    10 * hs.size_scale +
+                    10 * hs.sizeScale +
                     (hs.rotateX / 70) * 20) +
                   'px) translateZ(9999px)';
                 tooltip.style.webkitTransform = transform_tooltip;
