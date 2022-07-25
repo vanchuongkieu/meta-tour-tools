@@ -263,6 +263,17 @@ class Viewer extends PureComponent {
     panoViewer.toggleFullscreen();
   }
 
+  toggleOrientation() {
+    if (!utils.isMobileOrIOS) {
+      this.setState((prev) => ({
+        isOrientation: !prev.isOrientation,
+      }));
+      !this.state.isOrientation
+        ? panoViewer.startOrientation()
+        : panoViewer.stopOrientation();
+    }
+  }
+
   static loadRoom(idRoom, targetPitch, targetYaw, targetHfov) {
     $viewer.setState({isLoading: true});
     const pitch = panoViewer.getPitch();
@@ -287,19 +298,6 @@ class Viewer extends PureComponent {
 
   static setYawBounds(bounds) {
     panoViewer.setYawBounds(bounds);
-  }
-
-  toggleOrientation() {
-    if (!utils.isMobileOrIOS) {
-      this.setState((prev) => ({
-        isOrientation: prev.isOrientation,
-      }));
-      if (!this.state.isOrientation) {
-        panoViewer.startOrientation();
-        return;
-      }
-      panoViewer.stopOrientation();
-    }
   }
 
   static gotoNextroom() {
@@ -338,7 +336,7 @@ class Viewer extends PureComponent {
     return (
       <div className="panorama_wrapper">
         <div className="left-top-controls">
-          {isOrientationSupport && (
+          {!isOrientationSupport && (
             <div className="controls_btn" onClick={this.toggleOrientation}>
               {!isOrientation ? <FaRegCircle /> : <FaRegDotCircle />}
             </div>
