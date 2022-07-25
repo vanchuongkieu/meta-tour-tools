@@ -336,7 +336,7 @@ class Viewer extends PureComponent {
     return (
       <div className="panorama_wrapper">
         <div className="left-top-controls">
-          {!isOrientationSupport && (
+          {isOrientationSupport && (
             <div className="controls_btn" onClick={this.toggleOrientation}>
               {!isOrientation ? <FaRegCircle /> : <FaRegDotCircle />}
             </div>
