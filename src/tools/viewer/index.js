@@ -305,9 +305,9 @@ class Viewer extends PureComponent {
     objectKeys.forEach((scene, index) => {
       if (current === scene) {
         if (index + 1 < objectKeys.length) {
-          $viewer.loadRoom(objectKeys[index + 1]);
+          Viewer.loadRoom(objectKeys[index + 1]);
         } else {
-          $viewer.loadRoom(objectKeys[0]);
+          Viewer.loadRoom(objectKeys[0]);
         }
       }
     });
@@ -320,9 +320,9 @@ class Viewer extends PureComponent {
     objectKeys.forEach((scene, index) => {
       if (current === scene) {
         if (index - 1 >= 0) {
-          $viewer.loadRoom(objectKeys[index - 1]);
+          Viewer.loadRoom(objectKeys[index - 1]);
         } else {
-          $viewer.loadRoom(objectKeys[objectKeys.length - 1]);
+          Viewer.loadRoom(objectKeys[objectKeys.length - 1]);
         }
       }
     });
@@ -341,9 +341,11 @@ class Viewer extends PureComponent {
           )}
         </div>
         <div className="right-top-controls">
-          <div className="controls_btn" onClick={this.handleFullscreen}>
-            {!fullscreen ? <FaExpand /> : <FaCompress />}
-          </div>
+          {!isOrientationSupport && (
+            <div className="controls_btn" onClick={this.handleFullscreen}>
+              {!fullscreen ? <FaExpand /> : <FaCompress />}
+            </div>
+          )}
         </div>
         <div id="panorama_view"></div>
         <Loading loading={isLoading} />
