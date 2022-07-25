@@ -265,13 +265,10 @@ class Viewer extends PureComponent {
 
   toggleOrientation() {
     if (this.state.isOrientationSupport) {
-      if (this.state.isOrientation) {
-        const isOrientation = panoViewer.stopOrientation();
-        this.setState({isOrientation});
-      } else {
-        const isOrientation = panoViewer.startOrientation();
-        this.setState({isOrientation});
-      }
+      this.state.isOrientation
+        ? panoViewer.stopOrientation()
+        : panoViewer.startOrientation();
+      this.setState({isOrientation: !this.state.isOrientation});
     }
   }
 
