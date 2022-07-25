@@ -71,8 +71,10 @@ export type CoordsType = {
 };
 
 interface ViewerPropsType {
+  draggable?: boolean;
   children?: React.ReactNode;
   onMouseMove?: (coords: CoordsType) => void;
+  onDraggable?: (maker: MarkerPropsType) => void;
   onMouseWheel?: (hfov: number) => void;
   onLoadRoom?: (idRoom: string) => void;
   onError?: (message: string) => void;
@@ -82,7 +84,6 @@ function Viewer(props: ViewerPropsType): JSX.Element;
 
 namespace Viewer {
   export function Room(props: RoomPropsType): JSX.Element;
-  export function Compass(): JSX.Element;
   export function setPitch(pitch: number): void;
   export function setPitchBounds(bounds: number[]): void;
   export function setYaw(yaw: number): void;
