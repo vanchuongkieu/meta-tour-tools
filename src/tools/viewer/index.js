@@ -2,8 +2,16 @@ import utils from '@/utils';
 import PropTypes from 'prop-types';
 import Loading from './components/Loading';
 import {
+  FaAngleDoubleLeft,
+  FaAngleDoubleRight,
+  FaArrowDown,
+  FaArrowLeft,
+  FaArrowRight,
+  FaArrowUp,
   FaCompress,
   FaExpand,
+  FaMinus,
+  FaPlus,
   FaRegCircle,
   FaRegDotCircle,
 } from 'react-icons/fa';
@@ -51,22 +59,22 @@ class Viewer extends PureComponent {
       room.panorama = room.panoramaImage;
       room.friction = room.friction || 0.15;
       room.hotSpots = room.markers.map((marker) => {
+        let eventHandling = {};
         if (draggable) {
-          marker.draggable = draggable;
+          eventHandling = {
+            dragHandlerFunc: this.draggable,
+            dragHandlerArgs: marker,
+            draggable,
+          };
         }
+
         switch (marker.object) {
           case 'marker':
-            let eventHandling = {};
             let tooltip = marker.tooltipText;
-            if (marker.tooltip_type == 'room_name') {
+            if (marker.tooltipType == 'room_name') {
               tooltip = marker.nameRoomTarget;
             }
-            if (marker.draggable) {
-              eventHandling = {
-                dragHandlerFunc: this.draggable,
-                dragHandlerArgs: marker,
-              };
-            } else {
+            if (!draggable) {
               eventHandling = {
                 clickHandlerFunc: this.goto,
                 clickHandlerArgs: [
@@ -89,7 +97,6 @@ class Viewer extends PureComponent {
               yaw: marker.yaw,
               icon: marker.icon,
               type: marker.type,
-              draggable: marker.draggable,
               animation: marker.animation,
               transform3d: marker.transform3d,
               rotateX: marker.rotateX,
@@ -101,6 +108,32 @@ class Viewer extends PureComponent {
               nameRoomTarget: marker.nameRoomTarget,
               ...eventHandling,
             };
+          case 'pointer':
+            if (!draggable) {
+              eventHandling = {
+                clickHandlerFunc: this.clicker,
+                clickHandlerArgs: marker,
+              };
+            }
+            return {
+              id: marker.id,
+              text: marker.tooltipText,
+              cssClass: 'custom-hotspot',
+              createTooltipFunc: this.pointer,
+              createTooltipArgs: marker,
+              pitch: marker.pitch,
+              yaw: marker.yaw,
+              icon: marker.icon,
+              type: marker.type,
+              animation: marker.animation,
+              transform3d: marker.transform3d,
+              rotateX: marker.rotateX,
+              rotateZ: marker.rotateZ,
+              scale: marker.scale,
+              sizeScale: marker.sizeScale || 1,
+              object: marker.object,
+              ...eventHandling,
+            };
         }
       });
       delete room.markers;
@@ -110,7 +143,6 @@ class Viewer extends PureComponent {
       }
       return room;
     });
-
     return mappingRoom.reduce((accumulated, current) => {
       return {
         ...accumulated,
@@ -167,26 +199,20 @@ class Viewer extends PureComponent {
     hotSpotDiv.classList.add('custom-tooltip');
     hotSpotDiv.classList.add('noselect');
     hotSpotDiv.classList.add('marker_' + args.id);
-    hotSpotDiv.addEventListener('mouseover', function (e) {
-      if (!utils.isMobileOrIOS) {
+    if (!utils.isMobileOrIOS) {
+      hotSpotDiv.addEventListener('mouseover', function (e) {
         document.getElementById('tooltip_marker_' + args.id).style.opacity = 1;
-      }
-    });
-    hotSpotDiv.addEventListener('mouseenter', function (e) {
-      if (!utils.isMobileOrIOS) {
+      });
+      hotSpotDiv.addEventListener('mouseenter', function (e) {
         document.getElementById('tooltip_marker_' + args.id).style.opacity = 1;
-      }
-    });
-    hotSpotDiv.addEventListener('mouseleave', function (e) {
-      if (!utils.isMobileOrIOS) {
+      });
+      hotSpotDiv.addEventListener('mouseleave', function (e) {
         document.getElementById('tooltip_marker_' + args.id).style.opacity = 0;
-      }
-    });
-    hotSpotDiv.addEventListener('mouseup', function (e) {
-      if (!utils.isMobileOrIOS) {
+      });
+      hotSpotDiv.addEventListener('mouseup', function (e) {
         document.getElementById('tooltip_marker_' + args.id).style.opacity = 0;
-      }
-    });
+      });
+    }
 
     switch (args.tooltipType) {
       case 'text':
@@ -211,6 +237,63 @@ class Viewer extends PureComponent {
 
     const divWrapper = document.createElement('div');
     divWrapper.classList.add('div_marker_wrapper');
+    divWrapper.style.background = args.background;
+    divWrapper.style.color = args.color;
+    hotSpotDiv.appendChild(divWrapper);
+  }
+
+  clicker(_, marker) {
+    switch (marker.type) {
+      case 'link_ext':
+        window.open(marker.content, marker.linkTarget);
+        break;
+    }
+  }
+
+  pointer(hotSpotDiv, args) {
+    hotSpotDiv.classList.add('noselect');
+    hotSpotDiv.classList.add('custom-tooltip');
+    hotSpotDiv.classList.add('pointer_' + args.id);
+    if (!utils.isMobileOrIOS) {
+      hotSpotDiv.addEventListener('mouseover', function (e) {
+        document.getElementById('tooltip_pointer_' + args.id).style.opacity = 1;
+      });
+      hotSpotDiv.addEventListener('mouseenter', function (e) {
+        document.getElementById('tooltip_pointer_' + args.id).style.opacity = 1;
+      });
+      hotSpotDiv.addEventListener('mouseleave', function (e) {
+        document.getElementById('tooltip_pointer_' + args.id).style.opacity = 0;
+      });
+      hotSpotDiv.addEventListener('mouseup', function (e) {
+        document.getElementById('tooltip_pointer_' + args.id).style.opacity = 0;
+      });
+    }
+
+    switch (args.tooltipType) {
+      case 'text':
+        if (args.tooltipText && args.tooltipText !== '') {
+          const tooltip = document.createElement('div');
+          tooltip.setAttribute('id', 'tooltip_pointer_' + args.id);
+          tooltip.classList.add('tooltip_pointer_' + args.id);
+          tooltip.classList.add('tooltip_text');
+          tooltip.innerHTML = args.tooltipText.toUpperCase();
+          hotSpotDiv.parentNode.appendChild(tooltip);
+        }
+        break;
+      case 'image':
+        if (args.tooltipText && args.tooltipText !== '') {
+          const tooltip = document.createElement('div');
+          tooltip.setAttribute('id', 'tooltip_pointer_' + args.id);
+          tooltip.classList.add('tooltip_pointer_' + args.id);
+          tooltip.classList.add('tooltip_image');
+          tooltip.style.backgroundImage = `url('${args.tooltipImage}')`;
+          hotSpotDiv.parentNode.appendChild(tooltip);
+        }
+        break;
+    }
+
+    const divWrapper = document.createElement('div');
+    divWrapper.classList.add('div_pointer_wrapper');
     divWrapper.style.background = args.background;
     divWrapper.style.color = args.color;
     hotSpotDiv.appendChild(divWrapper);
@@ -270,6 +353,25 @@ class Viewer extends PureComponent {
         : panoViewer.startOrientation();
       this.setState({isOrientation: !this.state.isOrientation});
     }
+  }
+
+  gotoLeft() {
+    panoViewer.setYaw(panoViewer.getYaw() - 10);
+  }
+  gotoRight() {
+    panoViewer.setYaw(panoViewer.getYaw() + 10);
+  }
+  gotoUp() {
+    panoViewer.setPitch(panoViewer.getPitch() + 10);
+  }
+  gotoDown() {
+    panoViewer.setPitch(panoViewer.getPitch() - 10);
+  }
+  zoomIn() {
+    panoViewer.setHfov(panoViewer.getHfov() - 10);
+  }
+  zoomOut() {
+    panoViewer.setHfov(panoViewer.getHfov() + 10);
   }
 
   static loadRoom(idRoom, targetPitch, targetYaw, targetHfov) {
@@ -340,12 +442,36 @@ class Viewer extends PureComponent {
             </div>
           )}
         </div>
-        <div className="right-top-controls">
+        <div className="center-bottom-controls">
+          <div className="controls_btn" onClick={Viewer.gotoPrevroom}>
+            <FaAngleDoubleLeft />
+          </div>
+          <div className="controls_btn" onClick={this.gotoLeft}>
+            <FaArrowLeft />
+          </div>
+          <div className="controls_btn" onClick={this.gotoRight}>
+            <FaArrowRight />
+          </div>
+          <div className="controls_btn" onClick={this.gotoUp}>
+            <FaArrowUp />
+          </div>
+          <div className="controls_btn" onClick={this.gotoDown}>
+            <FaArrowDown />
+          </div>
+          <div className="controls_btn" onClick={this.zoomIn}>
+            <FaPlus />
+          </div>
+          <div className="controls_btn" onClick={this.zoomOut}>
+            <FaMinus />
+          </div>
           {!isOrientationSupport && (
             <div className="controls_btn" onClick={this.handleFullscreen}>
               {!fullscreen ? <FaExpand /> : <FaCompress />}
             </div>
           )}
+          <div className="controls_btn" onClick={Viewer.gotoNextroom}>
+            <FaAngleDoubleRight />
+          </div>
         </div>
         <div id="panorama_view"></div>
         <Loading loading={isLoading} />

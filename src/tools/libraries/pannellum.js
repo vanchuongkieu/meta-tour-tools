@@ -3860,7 +3860,6 @@ export default (function (window, document, undefined) {
      */
     this.stopOrientation = function () {
       stopOrientation();
-      return Boolean(orientation)
     };
 
     /**
@@ -3870,7 +3869,6 @@ export default (function (window, document, undefined) {
      */
     this.startOrientation = function () {
       startOrientation();
-      return Boolean(orientation)
     };
 
     /**

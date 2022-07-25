@@ -33,14 +33,15 @@ export interface MarkerPropsType {
   icon?: string;
   pitch?: number;
   tooltipText?: string;
-  tooltipType: 'room_name' | 'text';
+  tooltipImage?: string;
+  tooltipType: 'room_name' | 'text' | 'image';
   content?: string; // JSON stringify
   idRoomTarget?: string;
   nameRoomTarget?: string;
   pitchRoomTarget?: number;
   yawRoomTarget?: number;
   object?: 'pointer' | 'marker';
-  type?: 'video' | 'gallery' | 'marker' | 'link_ext' | 'form';
+  type?: 'video' | 'gallery' | 'marker' | 'link_ext' | 'form' | 'modal';
   linkTaret?: '_blank';
   embedType?: 'video' | 'gallery';
   embedCoords?: string; // JSON stringify

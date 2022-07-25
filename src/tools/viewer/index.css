@@ -41,7 +41,8 @@
   height: 30px;
 }
 
-.custom-hotspot .div_marker_wrapper {
+.custom-hotspot .div_marker_wrapper,
+.custom-hotspot .div_pointer_wrapper {
   padding: 8px 8px;
   border-radius: 40px;
   text-align: center;
@@ -50,15 +51,6 @@
   font-size: 16px;
   background-color: #ffffff;
   color: #000000;
-}
-.custom-hotspot-content .div_poi_wrapper {
-  padding: 8px 8px;
-  border-radius: 40px;
-  text-align: center;
-  min-width: 25px;
-  min-height: 14px;
-  font-size: 16px;
-  box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.8);
 }
 
 .tooltip_text {
@@ -82,6 +74,31 @@
   transition: opacity 0.3s ease-in-out;
 }
 
+.tooltip_image {
+  position: absolute;
+  z-index: 40;
+  width: 250px;
+  height: 150px;
+  top: 0;
+  left: 0;
+  margin-left: 0px;
+  margin-top: 0;
+  background-color: white;
+  font-size: 12px;
+  padding: 5px 10px;
+  border-radius: 10px;
+  transform: translate(0px, 0px) translateZ(9999px);
+  opacity: 0;
+  background-size: cover;
+  border: 2px solid #fff;
+  pointer-events: none;
+  -webkit-transition: opacity 0.3s ease-in-out;
+  -moz-transition: opacity 0.3s ease-in-out;
+  -ms-transition: opacity 0.3s ease-in-out;
+  -o-transition: opacity 0.3s ease-in-out;
+  transition: opacity 0.3s ease-in-out;
+}
+
 .right-top-controls,
 .left-top-controls {
   position: absolute;
@@ -95,6 +112,23 @@
 
 .left-top-controls {
   left: 10px;
+}
+
+.center-bottom-controls {
+  position: absolute;
+  bottom: 10px;
+  z-index: 42;
+  left: 50%;
+  display: flex;
+  gap: 5px;
+  transform: translateX(-50%);
+  background-color: rgba(0, 0, 0, 0.6);
+  padding: 5px 10px;
+  border-radius: 5px;
+}
+
+.center-bottom-controls .controls_btn {
+  background-color: transparent;
 }
 
 .right-top-controls .controls_btn,
