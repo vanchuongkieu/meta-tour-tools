@@ -456,6 +456,7 @@ export default (function (window, document, undefined) {
         panoImage = config.panorama;
         onImageLoad();
       }
+
     }
 
     /**
@@ -1634,24 +1635,6 @@ export default (function (window, document, undefined) {
       animate();
     }
 
-    function sync_helper_svt() {
-      try {
-        if (window.sync_poi_embed_enabled) {
-          adjust_poi_embed_helpers_all();
-        }
-      } catch (e) {}
-      try {
-        if (window.sync_marker_embed_enabled) {
-          adjust_marker_embed_helpers_all();
-        }
-      } catch (e) {}
-      try {
-        if (window.sync_virtual_staging_enabled) {
-          sync_virtual_staging_view();
-        }
-      } catch (e) {}
-    }
-
     /**
      * Animates view, using requestAnimationFrame to trigger rendering.
      * @private
@@ -1663,7 +1646,6 @@ export default (function (window, document, undefined) {
       render();
       if (autoRotateStart) clearTimeout(autoRotateStart);
       if (isUserInteracting || orientation === true) {
-        sync_helper_svt();
         requestAnimationFrame(animate);
       } else if (
         keysDown[0] ||
@@ -1694,13 +1676,11 @@ export default (function (window, document, undefined) {
           config.autoRotate = autoRotateSpeed;
           _this.lookAt(origPitch, undefined, origHfov, 3000);
         }
-        sync_helper_svt();
         requestAnimationFrame(animate);
       } else if (
         renderer &&
         (renderer.isLoading() || (config.dynamic === true && update))
       ) {
-        sync_helper_svt();
         requestAnimationFrame(animate);
       } else {
         if (_this.getPitch && _this.getYaw && _this.getHfov)
@@ -3880,6 +3860,7 @@ export default (function (window, document, undefined) {
      */
     this.stopOrientation = function () {
       stopOrientation();
+      return Boolean(orientation)
     };
 
     /**
@@ -3889,6 +3870,7 @@ export default (function (window, document, undefined) {
      */
     this.startOrientation = function () {
       startOrientation();
+      return Boolean(orientation)
     };
 
     /**
