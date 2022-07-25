@@ -2,19 +2,23 @@ import utils from '@/utils';
 import PropTypes from 'prop-types';
 import Loading from './components/Loading';
 import {
-  FaAngleDoubleLeft,
-  FaAngleDoubleRight,
-  FaArrowDown,
-  FaArrowLeft,
-  FaArrowRight,
-  FaArrowUp,
-  FaCompress,
-  FaExpand,
-  FaMinus,
-  FaPlus,
-  FaRegCircle,
-  FaRegDotCircle,
-} from 'react-icons/fa';
+  BiArrowFromTop,
+  BiCaretDown,
+  BiCaretLeft,
+  BiCaretRight,
+  BiCaretUp,
+  BiCollapse,
+  BiCompass,
+  BiExpand,
+  BiFastForward,
+  BiGridAlt,
+  BiMinus,
+  BiPlus,
+  BiRadioCircle,
+  BiRadioCircleMarked,
+  BiRewind,
+  BiVolumeFull,
+} from 'react-icons/bi';
 import pannellum from '../libraries/pannellum';
 import {PureComponent} from 'react';
 
@@ -162,6 +166,7 @@ class Viewer extends PureComponent {
       showZoomCtrl: false,
       showFullscreenCtrl: false,
       scenes: this.state.panoramas,
+      disableKeyboardCtrl: 0,
     });
     panoViewer.on('load', () => {
       if (utils.isMobileOrIOS) {
@@ -438,49 +443,85 @@ class Viewer extends PureComponent {
         <div className="left-top-controls">
           {isOrientationSupport && (
             <div className="controls_btn" onClick={this.toggleOrientation}>
-              {!isOrientation ? <FaRegCircle /> : <FaRegDotCircle />}
+              {!isOrientation ? <BiRadioCircle /> : <BiRadioCircleMarked />}
             </div>
           )}
         </div>
+        <div className="right-top-controls">
+          <div id="compass_icon" className="compass">
+            <BiCompass size={30} />
+          </div>
+        </div>
         <div className="center-bottom-controls">
-          <div className="controls_btn" onClick={Viewer.gotoPrevroom}>
-            <FaAngleDoubleLeft />
-          </div>
-          <div className="controls_btn" onClick={this.gotoLeft}>
-            <FaArrowLeft />
-          </div>
-          <div className="controls_btn" onClick={this.gotoRight}>
-            <FaArrowRight />
-          </div>
-          <div className="controls_btn" onClick={this.gotoUp}>
-            <FaArrowUp />
-          </div>
-          <div className="controls_btn" onClick={this.gotoDown}>
-            <FaArrowDown />
-          </div>
-          <div className="controls_btn" onClick={this.zoomIn}>
-            <FaPlus />
-          </div>
-          <div className="controls_btn" onClick={this.zoomOut}>
-            <FaMinus />
-          </div>
+          <BiRewind
+            className="btn-control"
+            size={40}
+            onClick={Viewer.gotoPrevroom}
+          />
+          <BiGridAlt
+            className="btn-control"
+            size={26}
+            onClick={Viewer.gotoPrevroom}
+          />
+          <BiVolumeFull className="btn-control" size={26} />
+          {/* <BiVolumeMute size={26} /> */}
           {!isOrientationSupport && (
-            <div className="controls_btn" onClick={this.handleFullscreen}>
-              {!fullscreen ? <FaExpand /> : <FaCompress />}
-            </div>
+            <>
+              <BiCaretLeft
+                className="btn-control small-hidden"
+                size={30}
+                onClick={this.gotoLeft}
+              />
+              <BiCaretRight
+                className="btn-control small-hidden"
+                size={30}
+                onClick={this.gotoRight}
+              />
+              <BiCaretUp
+                className="btn-control small-hidden"
+                size={30}
+                onClick={this.gotoUp}
+              />
+              <BiCaretDown
+                className="btn-control small-hidden"
+                size={30}
+                onClick={this.gotoDown}
+              />
+              <BiPlus
+                className="btn-control small-hidden"
+                size={30}
+                onClick={this.zoomIn}
+              />
+              <BiMinus
+                className="btn-control small-hidden"
+                size={30}
+                onClick={this.zoomOut}
+              />
+              {!fullscreen ? (
+                <BiExpand
+                  className="btn-control small-hidden"
+                  size={30}
+                  onClick={this.handleFullscreen}
+                />
+              ) : (
+                <BiCollapse
+                  className="btn-control small-hidden"
+                  size={30}
+                  onClick={this.handleFullscreen}
+                />
+              )}
+            </>
           )}
-          <div className="controls_btn" onClick={Viewer.gotoNextroom}>
-            <FaAngleDoubleRight />
-          </div>
+          <BiArrowFromTop className="btn-control" size={30} />
+          <BiFastForward
+            className="btn-control"
+            size={40}
+            onClick={Viewer.gotoNextroom}
+          />
         </div>
         <div id="panorama_view"></div>
         <Loading loading={isLoading} />
         <img id="panorama_background" />
-        <div className="bottom-controls">
-          <div id="compass_icon" className="controls_btn compass">
-            <i className="icon-compass"></i>
-          </div>
-        </div>
       </div>
     );
   }
