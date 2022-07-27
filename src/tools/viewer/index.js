@@ -1,24 +1,7 @@
 import utils from '@/utils';
 import PropTypes from 'prop-types';
 import Loading from './components/Loading';
-import {
-  BiArrowFromTop,
-  BiCaretDown,
-  BiCaretLeft,
-  BiCaretRight,
-  BiCaretUp,
-  BiCollapse,
-  BiCompass,
-  BiExpand,
-  BiFastForward,
-  BiGridAlt,
-  BiMinus,
-  BiPlus,
-  BiRadioCircle,
-  BiRadioCircleMarked,
-  BiRewind,
-  BiVolumeFull,
-} from 'react-icons/bi';
+import {BiCompass, BiRadioCircle, BiRadioCircleMarked} from 'react-icons/bi';
 import pannellum from '../libraries/pannellum';
 import {PureComponent} from 'react';
 
@@ -30,12 +13,10 @@ class Viewer extends PureComponent {
     $viewer = this;
     this.state = {
       isLoading: true,
-      fullscreen: false,
       isOrientation: false,
       isOrientationSupport: false,
       panoramas: this.panoramas(props),
     };
-    this.handleFullscreen = this.handleFullscreen.bind(this);
     this.toggleOrientation = this.toggleOrientation.bind(this);
   }
 
@@ -44,16 +25,20 @@ class Viewer extends PureComponent {
       PropTypes.arrayOf(PropTypes.node),
       PropTypes.node,
     ]).isRequired,
+    menu: PropTypes.array,
     draggable: PropTypes.bool,
+    keyboard: PropTypes.bool,
     onMouseWheel: PropTypes.func,
     onMouseMove: PropTypes.func,
     onDraggable: PropTypes.func,
-    onLoadRoom: PropTypes.func,
     onError: PropTypes.func,
+    onLoad: PropTypes.func,
   };
 
   static defaultProps = {
     draggable: false,
+    keyboard: false,
+    menu: [],
   };
 
   panoramas({children, draggable}) {
@@ -166,15 +151,7 @@ class Viewer extends PureComponent {
       showZoomCtrl: false,
       showFullscreenCtrl: false,
       scenes: this.state.panoramas,
-      disableKeyboardCtrl: 0,
-    });
-    panoViewer.on('load', () => {
-      if (utils.isMobileOrIOS) {
-        panoViewer.setFriction(0.4);
-      }
-      setTimeout(() => {
-        this.setState({isLoading: false});
-      }, 50);
+      disableKeyboardCtrl: Number(this.props.keyboard),
     });
     return panoViewer;
   }
@@ -309,7 +286,7 @@ class Viewer extends PureComponent {
     panoViewer.on('error', (message) => this.onError(message));
     panoViewer.on('mousewheel', (hfov) => this.onMouseWheel(hfov));
     panoViewer.on('mousemove', (coords) => this.onMouseMove(coords));
-    panoViewer.on('loadroom', (idRoom) => this.onLoadRoom(idRoom));
+    panoViewer.on('load', (idRoom) => this.onLoadRoom(idRoom));
     this.setState({isOrientationSupport: utils.isMobileOrIOS});
   }
 
@@ -318,7 +295,6 @@ class Viewer extends PureComponent {
   componentWillUnmount() {
     panoViewer.off('load');
     panoViewer.off('error');
-    panoViewer.off('loadroom');
     panoViewer.off('mousemove');
     panoViewer.off('mousewheel');
   }
@@ -334,21 +310,19 @@ class Viewer extends PureComponent {
   }
 
   onLoadRoom(idRoom) {
-    this.setState({isLoading: false});
-    if (!this.props.onLoadRoom) return;
-    this.props.onLoadRoom(idRoom);
+    if (utils.isMobileOrIOS) {
+      panoViewer.setFriction(0.4);
+    }
+    setTimeout(() => {
+      this.setState({isLoading: false});
+    }, 50);
+    if (!this.props.onLoad) return;
+    this.props.onLoad(idRoom);
   }
 
   onError(message) {
     if (!this.props.onError) return;
     this.props.onError(message);
-  }
-
-  handleFullscreen() {
-    this.setState((prev) => ({
-      fullscreen: !prev.fullscreen,
-    }));
-    panoViewer.toggleFullscreen();
   }
 
   toggleOrientation() {
@@ -360,22 +334,30 @@ class Viewer extends PureComponent {
     }
   }
 
-  gotoLeft() {
+  static handleFullscreen() {
+    return !panoViewer.toggleFullscreen();
+  }
+
+  static isOrientationSupport() {
+    return $viewer.state.isOrientationSupport;
+  }
+
+  static gotoLeft() {
     panoViewer.setYaw(panoViewer.getYaw() - 10);
   }
-  gotoRight() {
+  static gotoRight() {
     panoViewer.setYaw(panoViewer.getYaw() + 10);
   }
-  gotoUp() {
+  static gotoUp() {
     panoViewer.setPitch(panoViewer.getPitch() + 10);
   }
-  gotoDown() {
+  static gotoDown() {
     panoViewer.setPitch(panoViewer.getPitch() - 10);
   }
-  zoomIn() {
+  static zoomIn() {
     panoViewer.setHfov(panoViewer.getHfov() - 10);
   }
-  zoomOut() {
+  static zoomOut() {
     panoViewer.setHfov(panoViewer.getHfov() + 10);
   }
 
@@ -387,6 +369,10 @@ class Viewer extends PureComponent {
     panoViewer.lookAt(pitch, yaw, hfov - 0.5, 500, () => {
       panoViewer.loadScene(idRoom, targetPitch, targetYaw, targetHfov);
     });
+  }
+
+  static getRoom() {
+    return panoViewer.getScene();
   }
 
   static setPitch(pitch) {
@@ -436,8 +422,7 @@ class Viewer extends PureComponent {
   }
 
   render() {
-    const {isLoading, fullscreen, isOrientation, isOrientationSupport} =
-      this.state;
+    const {isLoading, isOrientation, isOrientationSupport} = this.state;
     return (
       <div className="panorama_wrapper">
         <div className="left-top-controls">
@@ -451,73 +436,6 @@ class Viewer extends PureComponent {
           <div id="compass_icon" className="compass">
             <BiCompass size={30} />
           </div>
-        </div>
-        <div className="center-bottom-controls">
-          <BiRewind
-            className="btn-control"
-            size={40}
-            onClick={Viewer.gotoPrevroom}
-          />
-          <BiGridAlt
-            className="btn-control"
-            size={26}
-            onClick={Viewer.gotoPrevroom}
-          />
-          <BiVolumeFull className="btn-control" size={26} />
-          {/* <BiVolumeMute size={26} /> */}
-          {!isOrientationSupport && (
-            <>
-              <BiCaretLeft
-                className="btn-control small-hidden"
-                size={30}
-                onClick={this.gotoLeft}
-              />
-              <BiCaretRight
-                className="btn-control small-hidden"
-                size={30}
-                onClick={this.gotoRight}
-              />
-              <BiCaretUp
-                className="btn-control small-hidden"
-                size={30}
-                onClick={this.gotoUp}
-              />
-              <BiCaretDown
-                className="btn-control small-hidden"
-                size={30}
-                onClick={this.gotoDown}
-              />
-              <BiPlus
-                className="btn-control small-hidden"
-                size={30}
-                onClick={this.zoomIn}
-              />
-              <BiMinus
-                className="btn-control small-hidden"
-                size={30}
-                onClick={this.zoomOut}
-              />
-              {!fullscreen ? (
-                <BiExpand
-                  className="btn-control small-hidden"
-                  size={30}
-                  onClick={this.handleFullscreen}
-                />
-              ) : (
-                <BiCollapse
-                  className="btn-control small-hidden"
-                  size={30}
-                  onClick={this.handleFullscreen}
-                />
-              )}
-            </>
-          )}
-          <BiArrowFromTop className="btn-control" size={30} />
-          <BiFastForward
-            className="btn-control"
-            size={40}
-            onClick={Viewer.gotoNextroom}
-          />
         </div>
         <div id="panorama_view"></div>
         <Loading loading={isLoading} />

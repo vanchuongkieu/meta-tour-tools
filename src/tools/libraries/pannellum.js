@@ -2050,7 +2050,7 @@ export default (function (window, document, undefined) {
       loaded = true;
 
       animateInit();
-      fireEvent('load');
+      fireEvent("load", config.id);
     }
 
     /**
@@ -3654,7 +3654,6 @@ export default (function (window, document, undefined) {
     this.loadScene = function (sceneId, pitch, yaw, hfov) {
       if (loaded !== false) {
         loadScene(sceneId, pitch, yaw, hfov);
-        fireEvent("loadroom", sceneId);
       }
       return this;
     };
@@ -3711,7 +3710,7 @@ export default (function (window, document, undefined) {
      */
     this.toggleFullscreen = function () {
       toggleFullscreen();
-      return this;
+      return fullscreenActive;
     };
 
     /**

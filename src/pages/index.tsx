@@ -1,14 +1,24 @@
+import ViewerControl from '@/components/ViewerControl';
 import Viewer from '@/tools/viewer';
 import type {GetStaticProps, NextPage} from 'next';
+import {useState} from 'react';
 
-const Home: NextPage = ({rooms}: any) => {
+const Home: NextPage = ({rooms, roomMenu}: any) => {
+  const [roomId, setRoomId] = useState<string>('');
+
   return (
     <div className="panoramas">
-      <Viewer onLoadRoom={console.log} onDraggable={console.log}>
+      <Viewer
+        keyboard
+        menu={roomMenu}
+        onLoad={setRoomId}
+        onDraggable={console.log}
+        onError={console.log}>
         {rooms.map((room: any) => (
           <Viewer.Room {...room} key={room.id} />
         ))}
       </Viewer>
+      <ViewerControl roomId={roomId} menu={roomMenu} />
     </div>
   );
 };
@@ -115,9 +125,98 @@ export const getStaticProps: GetStaticProps = () => {
     },
   ];
 
+  const roomMenu = [
+    {
+      name: 'Scene 1',
+      image: '',
+      roomId: 'scene1',
+    },
+    {
+      name: 'Scene x',
+      image: '',
+      roomId: 'scenex',
+    },
+    {
+      name: 'Scene x',
+      image: '',
+      roomId: 'scenex',
+    },
+    {
+      name: 'Scene x',
+      image: '',
+      roomId: 'scenex',
+    },
+    {
+      name: 'Scene x',
+      image: '',
+      roomId: 'scenex',
+    },
+    {
+      name: 'Scene x',
+      image: '',
+      roomId: 'scenex',
+    },
+    {
+      name: 'Scene x',
+      image: '',
+      roomId: 'scenex',
+    },
+    {
+      name: 'Scene x',
+      image: '',
+      roomId: 'scenex',
+    },
+    {
+      name: 'Scene x',
+      image: '',
+      roomId: 'scenex',
+    },
+    {
+      name: 'Scene x',
+      image: '',
+      roomId: 'scenex',
+    },
+    {
+      name: 'Scene x',
+      image: '',
+      roomId: 'scenex',
+    },
+    {
+      name: 'Scene x',
+      image: '',
+      roomId: 'scenex',
+    },
+    {
+      name: 'Scene x',
+      image: '',
+      roomId: 'scenex',
+    },
+    {
+      name: 'Scene x',
+      image: '',
+      roomId: 'scenex',
+    },
+    {
+      name: 'Scene x',
+      image: '',
+      roomId: 'scenex',
+    },
+    {
+      name: 'Scene x',
+      image: '',
+      roomId: 'scenex',
+    },
+    {
+      name: 'Scene 2',
+      image: '',
+      roomId: 'scene2',
+    },
+  ];
+
   return {
     props: {
       rooms,
+      roomMenu,
     },
   };
 };

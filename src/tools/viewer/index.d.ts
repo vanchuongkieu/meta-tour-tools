@@ -72,13 +72,15 @@ export type CoordsType = {
 };
 
 interface ViewerPropsType {
+  menu?: RecordType[];
   draggable?: boolean;
+  keyboard?: boolean;
   children?: React.ReactNode;
   onMouseMove?: (coords: CoordsType) => void;
   onDraggable?: (maker: MarkerPropsType) => void;
   onMouseWheel?: (hfov: number) => void;
-  onLoadRoom?: (idRoom: string) => void;
   onError?: (message: string) => void;
+  onLoad?: (idRoom: string) => void;
 }
 
 function Viewer(props: ViewerPropsType): JSX.Element;
@@ -99,6 +101,15 @@ namespace Viewer {
   export function stopOrientation(): void;
   export function gotoNextroom(): void;
   export function gotoPrevroom(): void;
+  export function isOrientationSupport(): boolean;
+  export function handleFullscreen(): boolean;
+  export function gotoLeft(): void;
+  export function gotoRight(): void;
+  export function gotoUp(): void;
+  export function gotoDown(): void;
+  export function zoomIn(): void;
+  export function zoomOut(): void;
+  export function getRoom(): string;
 }
 
 export default Viewer;
