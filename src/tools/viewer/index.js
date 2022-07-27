@@ -335,7 +335,8 @@ class Viewer extends PureComponent {
   }
 
   static handleFullscreen() {
-    return !panoViewer.toggleFullscreen();
+    const isFullsreen = panoViewer.toggleFullscreen();
+    return !isFullsreen;
   }
 
   static isOrientationSupport() {
