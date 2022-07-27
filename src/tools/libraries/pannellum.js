@@ -2822,7 +2822,7 @@ export default (function (window, document, undefined) {
      * @private
      */
     function toggleFullscreen() {
-      var elem_body = document.getElementsByTagName('html')[0];
+      var elem_body = document.getElementsByTagName('iframe')[0] || document.getElementsByTagName('html')[0];
       if (loaded && !error) {
         if (!fullscreenActive) {
           try {
